@@ -15,6 +15,7 @@ import {
 import { Home } from './src/screens/Home';
 import { CarDetails } from './src/screens/CarDetails';
 import { Scheduling } from './src/screens/Scheduling';
+import { SchedulingDetails } from './src/screens/SchedulingDetails';
 
 import theme from './src/styles/theme';
 
@@ -24,7 +25,7 @@ export default function App() {
     Inter_500Medium,
     Archivo_400Regular,
     Archivo_500Medium,
-    Archivo_600SemiBold
+    Archivo_600SemiBold,
   });
 
   if (!fontLoaded) {
@@ -33,7 +34,7 @@ export default function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Scheduling />
+      <SchedulingDetails />
     </ThemeProvider>
   );
 }
