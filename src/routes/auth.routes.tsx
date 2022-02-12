@@ -7,6 +7,8 @@ import { SignIn } from '../screens/SignIn';
 import { SignUpFirstStep } from '../screens/SignUp/SignUpFirstStep';
 import { SignUpSecondStep } from '../screens/SignUp/SignUpSecondStep';
 
+import { Profile } from '../screens/Profile';
+
 export function AuthRoutes(){
     const { Navigator, Screen } = createStackNavigator();
 
@@ -21,7 +23,7 @@ export function AuthRoutes(){
             />
             <Screen 
                 name="SignIn"
-                component={SignIn}
+                component={Profile}
             />
             <Screen 
                 name="SignUpFirstStep"
