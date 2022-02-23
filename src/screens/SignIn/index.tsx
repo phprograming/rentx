@@ -31,7 +31,7 @@ export function SignIn(){
 
     const theme = useTheme();
     const navigation = useNavigation();
-    const { sighIn } = useAuth();
+    const { signIn } = useAuth();
       
     async function handleSignIn(){
         try{
@@ -47,9 +47,7 @@ export function SignIn(){
     
             await schema.validate({ email, password });
 
-            sighIn({ email, password });
-
-            Alert.alert('Tudo certo');
+            signIn({ email, password });
         } catch(error) {
             if (error instanceof Yup.ValidationError){
                 Alert.alert('Opa!', error.message);

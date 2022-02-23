@@ -20,14 +20,16 @@ interface User {
     token: string;
 }
 
-interface SighInCredentials {
+interface SignInCredentials {
     email: string;
     password: string;
 }
 
 interface AuthContextData {
     user: User;
-    sighIn: (credentials: SighInCredentials) => Promise<void>;
+    signIn: (crendentials: SignInCredentials) => Promise<void>;
+    signOut: () => Promise<void>;
+    updatedUser: (user: User) => Promise<void>;
 }
 
 interface AuthProviderProps {
@@ -39,7 +41,7 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 function AuthProvider({ children } : AuthProviderProps){
     const [data, setData] = useState<User>({} as User);
 
-    async function sighIn({ email, password } : SighInCredentials) {
+    async function signIn({ email, password } : SignInCredentials) {
         try {
             const response = await api.post('/sessions', {
                 email,
@@ -47,6 +49,8 @@ function AuthProvider({ children } : AuthProviderProps){
             });
     
             const { token, user } = response.data;
+
+            console.log(response)
     
             api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
@@ -58,15 +62,47 @@ function AuthProvider({ children } : AuthProviderProps){
                     newUser.email = user.email,
                     newUser.driver_license = user.driver_license,
                     newUser.avatar = user.avatar,
-                    newUser.token = user.token
+                    newUser.token = token
                 });
             });
     
             setData({ ...user, token }); 
         } catch(error) {
-            throw new Error(error);
+            throw new Error(error as string);
         } 
     }
+
+    async function signOut() {
+        try {
+            const userCollection = database.get<ModelUser>('users');
+            await database.write(async () => {
+                const userSelected = await userCollection.find(data.id);
+                await userSelected.destroyPermanently();
+            });
+
+            setData({} as User);
+        } catch (error) {
+            throw new Error(error as string); 
+        }
+    }
+
+    async function updatedUser(user: User){
+        try {
+            const userCollection = database.get<ModelUser>('users');
+            await database.write(async () => {
+                const userSelected = await userCollection.find(user.id);
+                await userSelected.update(( userData ) => {
+                    userData.name = user.name,
+                    userData.driver_license = user.driver_license,
+                    userData.avatar = user.avatar
+                });
+            });
+    
+            setData(user);
+        } catch (error) {
+            throw new Error(error as string);
+        }
+      }
 
     useEffect(() => {
         async function loadUserData() {
@@ -89,7 +125,9 @@ function AuthProvider({ children } : AuthProviderProps){
         <AuthContext.Provider 
             value={{
                 user: data,
-                sighIn
+                signIn,
+                signOut,
+                updatedUser
             }}
         >
             { children }
